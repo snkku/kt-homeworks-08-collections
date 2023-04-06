@@ -22,45 +22,34 @@ class Likes {
     fun add (id: Int)
     {
         // add liked userId
-        likedBy += id
+        this.likedBy += id
     }
 
-    fun likedCount(): Int
-    {
-        // return like count
-        return likedBy.size
-    }
+    fun likedCount(): Int = this.likedBy.size
 
     // return liked userIds
-    fun likedBy(): Array<Int>
-    {
-        return likedBy
-    }
+    fun likedBy(): Array<Int> = this.likedBy
 
     fun disLike(id: Int)
     {
         // remove userId from liked array
-        if (likedBy.contains(id))
-            likedBy.drop(likedBy.indexOf(id))
+        if (this.likedBy.contains(id))
+            this.likedBy.drop(this.likedBy.indexOf(id))
     }
 }
 
 object WallService {
     private var posts = emptyArray<Post>()
+    private var lastPostId = 0
 
     fun add (post: Post): Post
     {
-        // ну ведь хэшкод должен быть уникальным?;)
-        post.id = post.hashCode()
+        post.id = ++lastPostId
         posts += post
         return posts.last()
     }
 
-    fun getLastPostId(): Int
-    {
-        val post = posts.last()
-        return post.id
-    }
+    fun getLastPostId(): Int = lastPostId
 
     fun getPost(id: Int): Post
     {
@@ -72,7 +61,7 @@ object WallService {
         throw Exception("Post not found")
     }
 
-    fun edit (newPost: Post): Boolean
+    fun update (newPost: Post): Boolean
     {
         for ((index, post) in posts.withIndex()) {
             if (post.id == newPost.id) {
@@ -87,6 +76,7 @@ object WallService {
     fun clear()
     {
         posts = emptyArray()
+        lastPostId = 0
     }
 }
 
