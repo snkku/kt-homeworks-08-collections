@@ -12,8 +12,9 @@ data class Post(
     val replyOwnerId: Int,
     val replyPostId: Int,
     var friendsOnly: Boolean,
-    var comments: Comments,
-    var likes: Likes
+    var comments: Comments?,
+    var likes: Likes?,
+    var attachments: Attachments?
 )
 
 class Comments
@@ -75,4 +76,20 @@ object WallService {
 
 fun main() {
 
+    val audio = Audio(1, 1, "Sting", "Shape of my heart", 3600, "http://sting.com", 0, 1, 3, 199999999)
+    val photo = Photo(2, 2, 1, 10, "Photo", 1919919919, 100, 50)
+    val direct_photo = DirectPhoto(3, 1, "http://myurl1", "http://myurl2")
+    val album = Album(4, object {}, 1, "Album name", "Album description", 199999999, 0, 10)
+    val page = Page(3, 10, "Page title")
+    val post1_attachments = Attachments
+    post1_attachments.add(audio.id, "audio", audio)
+    post1_attachments.add(photo.id, "photo", photo)
+    val post2_attachments = Attachments
+    post2_attachments.add(direct_photo.id, "direct_photo", direct_photo)
+    post2_attachments.add(album.id, "album", album)
+    post2_attachments.add(page.id, "page", page)
+    val post1 = Post(1, 1, 1, 1, 199999999, "Post text", 0, 0, true, null, null, attachments = post1_attachments)
+    val post2 = Post(1, 1, 1, 1, 199999999, "Post text", 0, 0, true, null, null, attachments = post2_attachments)
+
+    println(post1)
 }

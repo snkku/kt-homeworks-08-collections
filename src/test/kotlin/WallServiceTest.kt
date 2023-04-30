@@ -9,9 +9,9 @@ class WallServiceTest {
     fun clearBeforeTest() {
         WallService.clear()
         // заполняем несколькими постами
-        WallService.add(Post(0, 1, 1, 1, 1680692400, "My post 1", 1, 1, false, Comments(), Likes()))
-        WallService.add(Post(0, 1, 1, 1, 1680692401, "My post 2", 1, 1, true, Comments(), Likes()))
-        WallService.add(Post(0, 1, 1, 1, 1680692402, "My post 3", 1, 1, false, Comments(), Likes()))
+        WallService.add(Post(0, 1, 1, 1, 1680692400, "My post 1", 1, 1, false, Comments(), Likes(), null))
+        WallService.add(Post(0, 1, 1, 1, 1680692401, "My post 2", 1, 1, true, Comments(), Likes(), null))
+        WallService.add(Post(0, 1, 1, 1, 1680692402, "My post 3", 1, 1, false, Comments(), Likes(), null))
 
     }
 
@@ -41,9 +41,36 @@ class WallServiceTest {
     {
         val service = WallService
         val lastId = service.getLastPostId()
-        val post = service.add(Post(0, 1, 1, 1, 1680692402, "My post 4", 1, 1, false, Comments(), Likes()))
+        val post = service.add(Post(0, 1, 1, 1, 1680692402, "My post 4", 1, 1, false, Comments(), Likes(), null))
         val newId = service.getLastPostId()
         assertNotEquals(lastId, newId)
         assertNotNull(post)
+    }
+
+    @Test
+    fun addPostWithAttachments()
+    {
+        val service = WallService
+        val lastId = service.getLastPostId()
+        val audio = Audio(1, 1, "Sting", "Shape of my heart", 3600, "http://sting.com", 0, 1, 3, 199999999)
+        val photo = Photo(2, 2, 1, 10, "Photo", 1919919919, 100, 50)
+        val direct_photo = DirectPhoto(3, 1, "http://myurl1", "http://myurl2")
+        val album = Album(4, object {}, 1, "Album name", "Album description", 199999999, 0, 10)
+        val page = Page(3, 10, "Page title")
+        val post1_attachments = Attachments
+        post1_attachments.add(audio.id, "audio", audio)
+        post1_attachments.add(photo.id, "photo", photo)
+        val post2_attachments = Attachments
+        post2_attachments.add(direct_photo.id, "direct_photo", direct_photo)
+        post2_attachments.add(album.id, "album", album)
+        post2_attachments.add(page.id, "page", page)
+        val post1 = Post(1, 1, 1, 1, 199999999, "Post text", 0, 0, true, null, null, attachments = post1_attachments)
+        val post2 = Post(1, 1, 1, 1, 199999999, "Post text", 0, 0, true, null, null, attachments = post2_attachments)
+        val post1_id = service.add(post1)
+        val post2_id = service.add(post2)
+        val newId = service.getLastPostId()
+        assertNotEquals(lastId, newId)
+        assertNotNull(post1_id)
+        assertNotNull(post2_id)
     }
 }
