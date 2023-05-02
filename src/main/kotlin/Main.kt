@@ -1,6 +1,6 @@
 package ru.netology
 
-import java.lang.Exception
+import kotlin.Exception
 
 data class Post(
     var id: Int,
@@ -12,8 +12,8 @@ data class Post(
     val replyOwnerId: Int,
     val replyPostId: Int,
     var friendsOnly: Boolean,
-    var comments: Comments?,
-    var likes: Likes?,
+    var comments: Comments = Comments(), // init comments with post creations
+    var likes: Likes = Likes(),
     var attachments: Array<Attachment> = emptyArray(),
     var signer_id: Int = 0,
     var copy_history: Array<Int> = emptyArray(),
@@ -25,7 +25,46 @@ data class Post(
     var postponed_id: Int = 0
 )
 
-class Comments
+class Comments {
+    private var comment_id = 0
+    private var comments = emptyArray<Comment>()
+
+    fun addComment(authorId: Int, text: String): Comment {
+        comments += Comment(authorId, text)
+        comment_id++
+        return comments.last()
+    }
+
+    fun modifyComment(commentId: Int, text: String): Boolean {
+        comments.withIndex().forEach { (index, comment) ->
+            run {
+                if (commentId == index) {
+                    comments[index] = comment.copy(text = text)
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    fun removeComment(commentId: Int): Boolean {
+        comments.withIndex().forEach { (index) ->
+            run {
+                if (commentId == index) {
+                    comments.drop(index)
+                    return true
+                }
+            }
+        }
+        return false
+    }
+}
+
+data class Comment(
+    val author_id: Int,
+    var text: String
+)
+
 class Likes {
     private var likedBy = emptyArray<Int>()
 
@@ -46,6 +85,8 @@ class Likes {
     }
 }
 
+class PostNotFoundException(message: String) : Exception(message)
+
 object WallService {
     private var posts = emptyArray<Post>()
     private var lastPostId = 0
@@ -53,6 +94,17 @@ object WallService {
     fun add(post: Post): Post {
         posts += post.copy(id = ++lastPostId)
         return posts.last()
+    }
+
+    fun addComment(postId: Int, authorId: Int, text: String): Comment {
+        posts.withIndex().forEach { (index, post) ->
+            run {
+                if (index == postId) {
+                    return posts[index].comments.addComment(99, "Comment number 1")
+                }
+            }
+        }
+        throw PostNotFoundException("Post $postId not found! Cant add comment")
     }
 
     fun getLastPostId(): Int = lastPostId
@@ -84,26 +136,4 @@ object WallService {
 
 fun main() {
 
-    val audio = Audio(1, 1, "Sting", "Shape of my heart", 3600, "http://sting.com", 0, 1, 3, 199999999)
-    val photo = Photo(2, 2, 1, 10, "Photo", 1919919919, 100, 50)
-    val direct_photo = DirectPhoto(3, 1, "http://myurl1", "http://myurl2")
-    val album = Album(4, object {}, 1, "Album name", "Album description", 199999999, 0, 10)
-    val page = Page(3, 10, "Page title")
-    val post1Attachments = emptyArray<Attachment>().apply {
-        plus(AudioAttachment(audio))
-        plus(PhotoAttachment(photo))
-    }
-    val post2Attachments = emptyArray<Attachment>().apply {
-        plus(DirectPhotoAttachment(direct_photo))
-        plus(AlbumAttachment(album))
-        plus(PageAttachment(page))
-    }
-
-    println(post1Attachments)
-    println(post2Attachments)
-    val post1 = Post(1, 1, 1, 1, 199999999, "Post text", 0, 0, true, null, null, attachments = post1Attachments)
-    val post2 = Post(2, 1, 1, 1, 199994999, "Post text2", 0, 0, true, null, null, attachments = post2Attachments)
-
-    println(post1)
-    println(post2)
 }

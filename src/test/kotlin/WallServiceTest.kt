@@ -10,8 +10,8 @@ class WallServiceTest {
         WallService.clear()
         // заполняем несколькими постами
         WallService.add(Post(0, 1, 1, 1, 1680692400, "My post 1", 1, 1, false, Comments(), Likes()))
-        WallService.add(Post(0, 1, 1, 1, 1680692401, "My post 2", 1, 1, true, Comments(), Likes()))
-        WallService.add(Post(0, 1, 1, 1, 1680692402, "My post 3", 1, 1, false, Comments(), Likes()))
+        WallService.add(Post(1, 1, 1, 1, 1680692401, "My post 2", 1, 1, true, Comments(), Likes()))
+        WallService.add(Post(2, 1, 1, 1, 1680692402, "My post 3", 1, 1, false, Comments(), Likes()))
 
     }
 
@@ -37,8 +37,7 @@ class WallServiceTest {
     }
 
     @Test
-    fun addPost()
-    {
+    fun addPost() {
         val service = WallService
         val lastId = service.getLastPostId()
         val post = service.add(Post(0, 1, 1, 1, 1680692402, "My post 4", 1, 1, false, Comments(), Likes()))
@@ -48,13 +47,12 @@ class WallServiceTest {
     }
 
     @Test
-    fun addPostWithAttachments()
-    {
+    fun addPostWithAttachments() {
         val service = WallService
         val lastId = service.getLastPostId()
         val audio = Audio(1, 1, "Sting", "Shape of my heart", 3600, "http://sting.com", 0, 1, 3, 199999999)
         val photo = Photo(2, 2, 1, 10, "Photo", 1919919919, 100, 50)
-        val direct_photo = DirectPhoto(3, 1, "http://myurl1", "http://myurl2")
+        val directPhoto = DirectPhoto(3, 1, "http://myurl1", "http://myurl2")
         val album = Album(4, object {}, 1, "Album name", "Album description", 199999999, 0, 10)
         val page = Page(3, 10, "Page title")
 
@@ -63,17 +61,27 @@ class WallServiceTest {
             plus(PhotoAttachment(photo))
         }
         val post2Attachments = emptyArray<Attachment>().apply {
-            plus(DirectPhotoAttachment(direct_photo))
+            plus(DirectPhotoAttachment(directPhoto))
             plus(AlbumAttachment(album))
             plus(PageAttachment(page))
         }
-        val post1 = Post(1, 1, 1, 1, 199999999, "Post text", 0, 0, true, null, null, attachments = post1Attachments)
-        val post2 = Post(1, 1, 1, 1, 199999999, "Post text", 0, 0, true, null, null, attachments = post2Attachments)
-        val post1_id = service.add(post1)
-        val post2_id = service.add(post2)
+        val post1 = Post(1, 1, 1, 1, 199999999, "Post text", 0, 0, true, attachments = post1Attachments)
+        val post2 = Post(1, 1, 1, 1, 199999999, "Post text", 0, 0, true, attachments = post2Attachments)
+        val post1Id = service.add(post1)
+        val post2Id = service.add(post2)
         val newId = service.getLastPostId()
         assertNotEquals(lastId, newId)
-        assertNotNull(post1_id)
-        assertNotNull(post2_id)
+        assertNotNull(post1Id)
+        assertNotNull(post2Id)
+    }
+
+    @Test(expected = PostNotFoundException::class)
+    fun testAddCommentNotSuccess() {
+        WallService.addComment(9, 5, "test1 not success")
+    }
+
+    @Test
+    fun testAddCommentSuccess() {
+        WallService.addComment(1, 5, "test1 not success")
     }
 }
