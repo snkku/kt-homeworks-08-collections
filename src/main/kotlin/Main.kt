@@ -14,7 +14,15 @@ data class Post(
     var friendsOnly: Boolean,
     var comments: Comments?,
     var likes: Likes?,
-    var attachments: Attachments?
+    var attachments: Array<Attachment> = emptyArray(),
+    var signer_id: Int = 0,
+    var copy_history: Array<Int> = emptyArray(),
+    var can_pin: Boolean = true,
+    var can_edit: Boolean = true,
+    var is_pinned: Boolean = false,
+    var marked_as_ads: Boolean = false,
+    var is_favorite: Boolean = false,
+    var postponed_id: Int = 0
 )
 
 class Comments
@@ -81,15 +89,21 @@ fun main() {
     val direct_photo = DirectPhoto(3, 1, "http://myurl1", "http://myurl2")
     val album = Album(4, object {}, 1, "Album name", "Album description", 199999999, 0, 10)
     val page = Page(3, 10, "Page title")
-    val post1_attachments = Attachments
-    post1_attachments.add(audio.id, "audio", audio)
-    post1_attachments.add(photo.id, "photo", photo)
-    val post2_attachments = Attachments
-    post2_attachments.add(direct_photo.id, "direct_photo", direct_photo)
-    post2_attachments.add(album.id, "album", album)
-    post2_attachments.add(page.id, "page", page)
-    val post1 = Post(1, 1, 1, 1, 199999999, "Post text", 0, 0, true, null, null, attachments = post1_attachments)
-    val post2 = Post(1, 1, 1, 1, 199999999, "Post text", 0, 0, true, null, null, attachments = post2_attachments)
+    val post1Attachments = emptyArray<Attachment>().apply {
+        plus(AudioAttachment(audio))
+        plus(PhotoAttachment(photo))
+    }
+    val post2Attachments = emptyArray<Attachment>().apply {
+        plus(DirectPhotoAttachment(direct_photo))
+        plus(AlbumAttachment(album))
+        plus(PageAttachment(page))
+    }
+
+    println(post1Attachments)
+    println(post2Attachments)
+    val post1 = Post(1, 1, 1, 1, 199999999, "Post text", 0, 0, true, null, null, attachments = post1Attachments)
+    val post2 = Post(2, 1, 1, 1, 199994999, "Post text2", 0, 0, true, null, null, attachments = post2Attachments)
 
     println(post1)
+    println(post2)
 }

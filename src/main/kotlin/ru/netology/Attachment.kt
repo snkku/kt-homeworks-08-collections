@@ -1,28 +1,10 @@
 package ru.netology
 
-object Attachments {
-    private var attachments = emptyArray<Attachment>()
-
-    fun add(id: Int, type: String, obj: Any)
-    {
-        this.attachments += Attachment(id, type, obj)
-    }
-
-    override fun toString(): String {
-        val str = StringBuilder()
-        for (item in this.attachments)
-        {
-            str.appendLine(item.toString())
-        }
-        return str.toString()
-    }
-}
-
-data class Attachment(
-    val id: Int,
-    val type: String,
-    val obj: Any
+sealed class Attachment(
+    open val type: String
 )
+
+data class AudioAttachment(val audio: Audio) : Attachment("audio")
 
 data class Audio(
     val id: Int,
@@ -39,6 +21,9 @@ data class Audio(
     val is_hq: Boolean = true
 )
 
+
+data class PhotoAttachment(val photo: Photo) : Attachment("photo")
+
 data class Photo(
     val id: Int,
     val album_id: Int,
@@ -50,6 +35,7 @@ data class Photo(
     val height: Int
 )
 
+data class DirectPhotoAttachment(val direct_photo: DirectPhoto) : Attachment("direct_photo")
 data class DirectPhoto(
     val id: Int,
     val owner_id: Int,
@@ -57,6 +43,7 @@ data class DirectPhoto(
     val photo_604: String
 )
 
+data class AlbumAttachment(val album: Album) : Attachment("album")
 data class Album(
     val id: Int,
     val thumb: Any,
@@ -68,6 +55,7 @@ data class Album(
     val size: Int
 )
 
+data class PageAttachment(val page: Page) : Attachment("page")
 data class Page(
     val id: Int,
     val group_id: Int,
