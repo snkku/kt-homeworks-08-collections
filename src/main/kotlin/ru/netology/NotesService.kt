@@ -3,15 +3,18 @@ data class Note(
     val title: String,
     val text: String,
     val comments: MutableList<Comment>,
+    override var deleted: Boolean = false
 ) : Identifiable
 
 data class Comment(
     override val id: Int,
-    val message: String,
+    var message: String,
+    override var deleted: Boolean = false
 ) : Identifiable
 
 interface Identifiable {
     val id: Int
+    val deleted: Boolean
 }
 
 object NotesService {
@@ -20,6 +23,12 @@ object NotesService {
     fun add(note: Note): Int {
         list.add(note.copy(id = id++))
         return id
+    }
+
+    fun clear()
+    {
+        this.list = mutableListOf<Note>()
+        this.id = 0
     }
 
     fun addComment(noteId: Int, comment: Comment) {
@@ -47,29 +56,72 @@ object NotesService {
     }
 
     fun getById(id: Int): Note? {
-        for (elem in list) {
+        for (elem in this.list) {
             if (elem.id == id)
                 return elem
         }
         return null
     }
 
-    fun <E : Identifiable> get(id: Int, list: List<E>): E? {
+    fun <E : Identifiable> get(id: Int, list: List<E>, deleted: Boolean = false): E? {
         for (elem in list) {
-            if (elem.id == id)
+            if (elem.id == id && elem.deleted == deleted)
                 return elem
         }
         return null
     }
 
     fun remove(id: Int) {
-        for (elem in this.list) {
+        for (elem in list) {
             if (elem.id == id)
             {
                 this.list.remove(elem)
                 return
             }
         }
+    }
+
+    fun removeComment(id: Int, noteId: Int, permanent: Boolean = false): Int {
+        val note = this.getById(noteId)
+        if (note !== null) {
+            for (comment in note.comments) {
+                if (comment.id == id) {
+                    when (permanent) {
+                        true -> note.comments.remove(comment)
+                        false -> comment.deleted = true
+                    }
+                    return 1
+                }
+            }
+        }
+        return 180
+    }
+    fun restoreComment(id: Int, noteId: Int): Int
+    {
+        val note = this.getById(noteId)
+        if (note !== null) {
+            for (elem in note.comments)
+            {
+                if (elem.id == id)
+                {
+                    elem.deleted = false
+                    return 1
+                }
+            }
+        }
+        return 180
+    }
+
+    fun editComment(id: Int, noteId: Int, comment: Comment): Int
+    {
+        val note = this.getById(noteId)
+        if (note !== null)
+        {
+            val thisComment = this.get(id, note.comments)
+            thisComment ?: comment.copy()
+            return 1
+        }
+        return 180
     }
 
     override fun toString(): String {
