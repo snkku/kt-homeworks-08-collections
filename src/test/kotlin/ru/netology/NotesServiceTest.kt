@@ -14,6 +14,7 @@ class NotesServiceTest {
 
     @Before
     fun initiate() {
+        ns.clear()
         ns.add(Note(0, "Test", "Test1", mutableListOf()))
         ns.add(Note(0, "Test2", "Test2", mutableListOf()))
         ns.add(Note(0, "Test3", "Test3", mutableListOf()))
@@ -35,7 +36,7 @@ class NotesServiceTest {
 
     @Test
     fun getComments() {
-        assertNull(ns.getComments(3))
+        assertNotNull(ns.getComments(2))
     }
 
     @Test
@@ -55,5 +56,41 @@ class NotesServiceTest {
     fun remove() {
         ns.remove(10)
         assertNull(ns.get(10, ns.list))
+    }
+
+    @Test
+    fun removeComment()
+    {
+        val result = ns.removeComment(1, 2)
+        assertEquals(1, result)
+    }
+
+    @Test
+    fun removeCommentUnsucess()
+    {
+        val result = ns.removeComment(2,2)
+        assertEquals(180, result)
+    }
+
+    @Test
+    fun restoreComment()
+    {
+        val result = ns.restoreComment(1,2)
+        assertEquals(1, result)
+    }
+
+    @Test
+    fun editComment()
+    {
+        val comment = ns.get(1, ns.getComments(2)!!)
+        if (comment !== null)
+        {
+            val newMessage = "New message"
+            comment.message = newMessage
+            val result = ns.editComment(1, 2, comment)
+            val newComment = ns.get(1, ns.getComments(2)!!)
+            assertEquals(newMessage, newComment!!.message)
+            assertEquals(1, result)
+        }
     }
 }
